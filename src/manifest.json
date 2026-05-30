@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Open in Diffshub",
+  "version": "1.0.0",
+  "description": "Adds a button on GitHub pull request pages to open the same PR on diffshub.com.",
+  "homepage_url": "https://github.com/hewigovens/open-in-diffs",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/*/*/pull/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Open this PR in Diffshub",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "open-in-diffs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Adds a button on GitHub pull request pages to open the same PR on diffshub.com.",
+  "homepage": "https://github.com/hewigovens/open-in-diffs",
+  "bugs": {
+    "url": "https://github.com/hewigovens/open-in-diffs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hewigovens/open-in-diffs.git"
+  },
+  "license": "MIT",
+  "author": "hewigovens <hewigovens@gmail.com>",
+  "keywords": [
+    "chrome-extension",
+    "edge-extension",
+    "browser-extension",
+    "github",
+    "pull-request",
+    "diffshub",
+    "manifest-v3"
+  ],
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "gen-icons": "bash scripts/gen-icons.sh",
+    "clean": "rm -rf dist"
+  }
+}

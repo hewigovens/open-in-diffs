@@ -1,0 +1,8 @@
+dist/
+node_modules/
+.DS_Store
+
+# Generated from src/icons/icon.svg via `npm run gen-icons`
+src/icons/icon16.png
+src/icons/icon48.png
+src/icons/icon128.png
