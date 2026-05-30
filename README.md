@@ -4,9 +4,9 @@ A small Chrome / Edge extension (MV3) that adds an **Open in Diffshub** button t
 
 ## Demo
 
-<video src="docs/demo.webm" controls width="100%" muted preload="metadata">
-  <a href="docs/demo.webm">Watch the demo</a>
-</video>
+[![Open in Diffshub demo — click to play](docs/demo-thumb.png)](docs/demo.webm)
+
+_Click the screenshot to play the demo._
 
 ## Features
 
