@@ -35,15 +35,27 @@ The extension only runs on GitHub pull request pages and uses the `activeTab` pe
 
 ## Develop
 
-Requires `bash`, `jq`, `zip`, and ImageMagick (`magick`).
+For local development you don't need a build — just **Load unpacked** from `src/` (above).
+
+To produce the signed `.crx` the store accepts, you need `jq`, ImageMagick (`magick` or `convert`), a Chromium-based browser, and an RSA signing key:
 
 ```sh
-npm run build       # rasterizes icons if stale, then zips src/ → dist/open-in-diffs-<version>.zip
-npm run gen-icons   # one-off: rasterize src/icons/icon.svg into 16/48/128 PNGs
-npm run clean       # rm -rf dist
+npm run gen-icons              # rasterize src/icons/icon.svg → 16/48/128 PNGs
+npm run pack -- path/key.pem   # sign src/ → dist/open-in-diffs-<version>.crx
+npm run clean                  # rm -rf dist
 ```
 
-Bump the version in `src/manifest.json` only — `package.json` is auto-synced on build.
+`src/manifest.json` is the single source of truth for the version.
+
+## Releasing
+
+Releases are automated. Tag a version and push:
+
+```sh
+git tag v1.0.1 && git push --tags
+```
+
+The [release workflow](.github/workflows/release.yml) signs a `.crx`, attaches it to a GitHub Release, and publishes to the Chrome Web Store. Publishing uses [Verified CRX Uploads](https://developer.chrome.com/blog/verified-uploads-cws): the package is signed with a private key held only in the `CWS_SIGNING_KEY` secret, and the step is gated behind a protected environment that requires manual approval.
 
 ## Layout
 
@@ -56,8 +68,9 @@ src/                              # the extension (Load Unpacked points here)
     ├── icon.svg                  # brand mark, committed
     └── icon{16,48,128}.png       # gitignored, generated from icon.svg
 scripts/
-├── build.sh                      # bash + jq + zip
-└── gen-icons.sh                  # bash + ImageMagick
-docs/
-└── demo.webm
+├── gen-icons.sh                  # rasterize the SVG into PNGs (ImageMagick)
+├── pack-crx.sh                   # sign src/ into a .crx (Chromium)
+└── publish-cws.sh                # upload + publish to the Chrome Web Store
+.github/workflows/                # ci.yml (build) and release.yml (sign + publish)
+docs/                             # demo.gif, demo.webm, store screenshot
 ```

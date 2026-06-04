@@ -7,9 +7,16 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SVG="$ROOT/src/icons/icon.svg"
 
-command -v magick >/dev/null || { echo "magick (ImageMagick) not found in PATH" >&2; exit 1; }
+# ImageMagick 7 ships `magick`; IM6 (e.g. on Ubuntu CI) ships `convert`.
+if command -v magick >/dev/null; then
+  IM=(magick)
+elif command -v convert >/dev/null; then
+  IM=(convert)
+else
+  echo "ImageMagick not found in PATH (need 'magick' or 'convert')" >&2; exit 1
+fi
 
 for s in 16 48 128; do
-  magick -background none -density 384 "$SVG" -resize "${s}x${s}" "$ROOT/src/icons/icon${s}.png"
+  "${IM[@]}" -background none -density 384 "$SVG" -resize "${s}x${s}" "$ROOT/src/icons/icon${s}.png"
   echo "wrote src/icons/icon${s}.png"
 done
