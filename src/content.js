@@ -93,9 +93,9 @@
     const btn = buildButton();
     // vertical-align:middle anchors at x-height/2 above the baseline, but
     // cap-height is higher — so the button reads slightly below the title's
-    // visual center. Shift it up ~10% of the title's font-size to compensate.
+    // visual center. Shift it up ~16% of the title's font-size to compensate.
     const fs = parseFloat(getComputedStyle(anchor).fontSize);
-    if (fs > 0) btn.style.transform = `translateY(${(-fs * 0.1).toFixed(1)}px)`;
+    if (fs > 0) btn.style.transform = `translateY(${(-fs * 0.16).toFixed(1)}px)`;
     anchor.appendChild(btn);
   }
 
