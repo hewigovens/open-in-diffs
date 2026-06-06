@@ -2,6 +2,8 @@
 
 A small Chrome / Edge extension (MV3) that adds an **Open in Diffshub** button to every GitHub pull request page. Click it (or the toolbar icon) to open the same PR on [diffshub.com](https://diffshub.com).
 
+[![Available in the Chrome Web Store](https://img.shields.io/chrome-web-store/v/pgmcdokikomeilbkobgfmlihmilingpl?label=Chrome%20Web%20Store)](https://chromewebstore.google.com/detail/open-in-diffshub/pgmcdokikomeilbkobgfmlihmilingpl)
+
 > **Not affiliated with diffshub.com.** This is an unofficial, community-built extension that simply links to diffshub.com. It is not made, endorsed, or maintained by Diffshub.
 
 ## Demo
@@ -27,9 +29,13 @@ _Higher-quality recording: [docs/demo.webm](docs/demo.webm)._
 
 The extension only runs on GitHub pull request pages and uses the `activeTab` permission. It reads the current tab's URL to build the diffshub link and opens a new tab — nothing is collected, stored, or sent anywhere.
 
-## Install (unpacked)
+## Install
 
-1. Open `edge://extensions` (or `chrome://extensions`).
+[**Install from the Chrome Web Store**](https://chromewebstore.google.com/detail/open-in-diffshub/pgmcdokikomeilbkobgfmlihmilingpl) — works in both Chrome and Edge.
+
+### Unpacked (for development)
+
+1. Open `chrome://extensions` (or `edge://extensions`).
 2. Toggle **Developer mode** on.
 3. Click **Load unpacked** and select this repo's `src/` folder.
 
