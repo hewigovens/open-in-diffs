@@ -1,8 +1,8 @@
 {
   "name": "open-in-diffs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
-  "description": "Adds a button on GitHub pull request pages to open the same PR on diffshub.com.",
+  "description": "Adds a button on GitHub pull request and compare pages to open the same diff on diffshub.com.",
   "homepage": "https://github.com/hewigovens/open-in-diffs",
   "bugs": {
     "url": "https://github.com/hewigovens/open-in-diffs/issues"

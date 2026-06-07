@@ -1,6 +1,6 @@
 # Open in Diffshub
 
-A small Chrome / Edge extension (MV3) that adds an **Open in Diffshub** button to every GitHub pull request page. Click it (or the toolbar icon) to open the same PR on [diffshub.com](https://diffshub.com).
+A small Chrome / Edge extension (MV3) that opens the diffshub.com equivalent of a GitHub diff. On a pull request it adds an **Open in Diffshub** button; on compare pages — and PRs too — there's a right-click menu item and a toolbar-icon shortcut. Everything just swaps `github.com` for [diffshub.com](https://diffshub.com) on the same path.
 
 [![Available in the Chrome Web Store](https://img.shields.io/chrome-web-store/v/pgmcdokikomeilbkobgfmlihmilingpl?label=Chrome%20Web%20Store)](https://chromewebstore.google.com/detail/open-in-diffshub/pgmcdokikomeilbkobgfmlihmilingpl)
 [![CI](https://github.com/hewigovens/open-in-diffs/actions/workflows/ci.yml/badge.svg)](https://github.com/hewigovens/open-in-diffs/actions/workflows/ci.yml)
@@ -15,20 +15,20 @@ _Higher-quality recording: [docs/demo.webm](docs/demo.webm)._
 
 ## Features
 
-- One click opens any GitHub pull request on diffshub.com — same path, just the hostname swapped.
-- Available on every PR sub-page: Conversation, Files changed, Checks, Commits.
+- **PR button** — one click opens the current pull request on diffshub.com; present on every PR sub-page (Conversation, Files changed, Checks, Commits), anchored to the PR title.
+- **Right-click menu** — "Open in Diffshub" appears on PR and `/compare/...` pages (including `?expand=1` pre-PR views), which have no stable spot for an in-page button.
+- **Toolbar icon** — click it from any GitHub PR or compare tab and the diffshub equivalent opens in a new tab (other tabs go to the diffshub home).
 - Works without a GitHub sign-in.
-- Toolbar-icon shortcut — click it from any GitHub PR tab and the diffshub equivalent opens in a new tab (non-PR tabs go to the diffshub home).
 
 ## How it works
 
-- The content script anchors on the PR title `<h1>` (identified by the `#<number>` in the URL), so it stays stable across GitHub's classic and new UIs.
-- The toolbar action handler does the same hostname swap from a tiny background service worker.
-- Vanilla JS — no bundler, no runtime dependencies.
+- On a PR page the content script anchors the button on the title `<h1>` (identified by the `#<number>` in the URL), so it stays stable across GitHub's classic and new UIs.
+- Compare pages have no equally stable, visible anchor (the "Comparing changes" heading is hidden on `?expand=1`), so they're covered by the right-click menu and toolbar icon instead — both handled by a tiny background service worker that does the same hostname swap. The context menu is scoped to PR and compare URLs so it only appears where it does something.
+- Vanilla JS — no bundler, no build step, no runtime dependencies.
 
 ## Privacy
 
-The extension only runs on GitHub pull request pages and uses the `activeTab` permission. It reads the current tab's URL to build the diffshub link and opens a new tab — nothing is collected, stored, or sent anywhere.
+The extension uses the `activeTab` and `contextMenus` permissions, with no host permissions. The in-page button only runs on GitHub pull request pages; the menu and toolbar icon read the current tab's URL to build the diffshub link and open a new tab — nothing is collected, stored, or sent anywhere.
 
 ## Install
 
@@ -70,7 +70,7 @@ The [release workflow](.github/workflows/release.yml) signs a `.crx`, attaches i
 src/                              # the extension (Load Unpacked points here)
 ├── manifest.json                 # MV3, single source of truth for the version
 ├── content.js                    # injects the Diffshub button into PR pages
-├── background.js                 # toolbar-icon click handler
+├── background.js                 # toolbar-icon + right-click menu handler (PR & compare)
 └── icons/
     ├── icon.svg                  # brand mark, committed
     └── icon{16,48,128}.png       # gitignored, generated from icon.svg
