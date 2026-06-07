@@ -41,11 +41,3 @@ jobs:
         with:
           files: dist/*.crx
           generate_release_notes: true
-
-      - name: Publish to Chrome Web Store
-        env:
-          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
-          CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
-          CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
-          CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
-        run: bash scripts/publish-cws.sh dist/open-in-diffs-*.crx

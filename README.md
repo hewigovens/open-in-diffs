@@ -62,7 +62,9 @@ Releases are automated. Tag a version and push:
 git tag v1.0.1 && git push --tags
 ```
 
-The [release workflow](.github/workflows/release.yml) signs a `.crx`, attaches it to a GitHub Release, and publishes to the Chrome Web Store. Publishing uses [Verified CRX Uploads](https://developer.chrome.com/blog/verified-uploads-cws): the package is signed with a private key held only in the `CWS_SIGNING_KEY` secret, and the step is gated behind a protected environment that requires manual approval.
+The [release workflow](.github/workflows/release.yml) signs a `.crx` and attaches it to a GitHub Release. The package is signed with a private key held only in the `CWS_SIGNING_KEY` secret ([Verified CRX Uploads](https://developer.chrome.com/blog/verified-uploads-cws)), kept in the protected `chrome-web-store` environment.
+
+Publishing to the store itself is manual.
 
 ## Layout
 
