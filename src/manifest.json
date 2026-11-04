@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "Open in Diffshub",
-  "version": "1.0.1",
-  "description": "Adds a button on GitHub pull request and compare pages to open the same diff on diffshub.com.",
+  "name": "Open in Diff Viewer",
+  "version": "1.1.0",
+  "description": "Open GitHub pull requests and compare pages in a better diff viewer: JayJay Diff or Diffshub.",
   "homepage_url": "https://github.com/hewigovens/open-in-diffs",
   "permissions": [
     "activeTab",
-    "contextMenus"
+    "contextMenus",
+    "storage"
   ],
   "content_scripts": [
     {
@@ -14,6 +15,7 @@
         "https://github.com/*/*/pull/*"
       ],
       "js": [
+        "targets.js",
         "content.js"
       ],
       "run_at": "document_idle"
@@ -22,8 +24,12 @@
   "background": {
     "service_worker": "background.js"
   },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
   "action": {
-    "default_title": "Open in Diffshub",
+    "default_title": "Open in Diff Viewer",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

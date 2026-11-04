@@ -34,6 +34,8 @@ jobs:
         run: |
           node --check src/content.js
           node --check src/background.js
+          node --check src/targets.js
+          node --check src/options.js
 
       - name: Pack CRX (throwaway key — verifies the build end to end)
         run: |

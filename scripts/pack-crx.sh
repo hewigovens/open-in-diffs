@@ -25,12 +25,12 @@ fi
 
 VERSION=$(jq -r .version src/manifest.json)
 
-# Ensure icons exist, then stage exactly what ships (same as the zip, minus icon.svg).
+# Ensure icons exist, then stage exactly what ships (src/ minus icon.svg).
 bash scripts/gen-icons.sh >/dev/null
 STAGE=$(mktemp -d)
 CRX_TMP="$STAGE.crx"
 trap 'rm -rf "$STAGE" "$CRX_TMP"' EXIT
-cp src/manifest.json src/content.js src/background.js "$STAGE/"
+cp src/manifest.json src/targets.js src/content.js src/background.js src/options.html src/options.js "$STAGE/"
 mkdir -p "$STAGE/icons"
 cp src/icons/icon16.png src/icons/icon48.png src/icons/icon128.png "$STAGE/icons/"
 

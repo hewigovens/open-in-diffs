@@ -1,8 +1,8 @@
 {
   "name": "open-in-diffs",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
-  "description": "Adds a button on GitHub pull request and compare pages to open the same diff on diffshub.com.",
+  "description": "Open GitHub pull requests and compare pages in a better diff viewer: JayJay Diff or Diffshub.",
   "homepage": "https://github.com/hewigovens/open-in-diffs",
   "bugs": {
     "url": "https://github.com/hewigovens/open-in-diffs/issues"
@@ -19,8 +19,10 @@
     "browser-extension",
     "github",
     "pull-request",
+    "manifest-v3",
     "diffshub",
-    "manifest-v3"
+    "jayjay",
+    "code-review"
   ],
   "scripts": {
     "gen-icons": "bash scripts/gen-icons.sh",

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Open in Diff Viewer options</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --muted: #59636e;
+        --danger: #d1242f;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --muted: #9198a1;
+          --danger: #f85149;
+        }
+      }
+      body {
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        /* No min-width: Edge's options dialog is ~370px and scrolls anything wider. */
+        margin: 16px;
+      }
+      fieldset {
+        border: 0;
+        margin: 0;
+        padding: 0;
+      }
+      legend {
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      label {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 4px 0;
+      }
+      .note {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      #status {
+        min-height: 1.5em;
+        margin: 8px 0 0;
+      }
+      #status.error {
+        color: var(--danger);
+      }
+    </style>
+  </head>
+  <body>
+    <form id="form">
+      <fieldset>
+        <legend>Open GitHub diffs in</legend>
+        <div id="presets"></div>
+      </fieldset>
+      <p id="status" role="status"></p>
+    </form>
+    <script src="targets.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

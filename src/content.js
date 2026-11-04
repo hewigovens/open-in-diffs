@@ -1,15 +1,11 @@
 (() => {
   "use strict";
 
-  const BTN_ID = "diffshub-open-btn";
-  const TARGET_HOST = "diffshub.com";
+  const BTN_ID = "diff-viewer-open-btn";
   const SVG_NS = "http://www.w3.org/2000/svg";
 
-  function diffshubUrl() {
-    const u = new URL(location.href);
-    u.hostname = TARGET_HOST;
-    return u.toString();
-  }
+  // Chosen viewer (targets.js); loaded before injecting, refreshed on change.
+  let target = DiffTargets.resolve();
 
   // The PR title <h1> carries the PR number, so we can find it without relying
   // on hashed class names. (Compare pages have no stable anchor — handled in
@@ -45,13 +41,9 @@
     const btn = document.createElement("button");
     btn.id = BTN_ID;
     btn.type = "button";
-    btn.title = "Open in Diffshub";
-    btn.setAttribute("aria-label", "Open in Diffshub");
     btn.appendChild(buildIcon());
-
-    const label = document.createElement("span");
-    label.textContent = "Diffshub";
-    btn.appendChild(label);
+    btn.appendChild(document.createElement("span"));
+    applyLabel(btn);
 
     Object.assign(btn.style, {
       display: "inline-flex",
@@ -78,10 +70,17 @@
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      window.open(diffshubUrl(), "_blank", "noopener,noreferrer");
+      const url = DiffTargets.urlFor(target, location.href);
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
     });
 
     return btn;
+  }
+
+  function applyLabel(btn) {
+    btn.title = `Open in ${target.name}`;
+    btn.setAttribute("aria-label", btn.title);
+    btn.querySelector("span").textContent = target.name;
   }
 
   function tryInject() {
@@ -97,15 +96,26 @@
     anchor.appendChild(btn);
   }
 
-  const observer = new MutationObserver(() => {
-    if (!document.getElementById(BTN_ID)) tryInject();
+  async function refreshTarget() {
+    target = await DiffTargets.load();
+    const btn = document.getElementById(BTN_ID);
+    if (btn) applyLabel(btn);
+  }
+
+  chrome.storage.onChanged.addListener(refreshTarget);
+
+  // Inject only once the stored choice is known, so the button never shows
+  // (or opens) the default viewer for a user who picked another.
+  refreshTarget().then(() => {
+    new MutationObserver(() => {
+      if (!document.getElementById(BTN_ID)) tryInject();
+    }).observe(document.documentElement, { childList: true, subtree: true });
+
+    // GitHub navigates via Turbo/SPA, not full loads.
+    document.addEventListener("turbo:load", tryInject);
+    document.addEventListener("pjax:end", tryInject);
+    window.addEventListener("popstate", tryInject);
+
+    tryInject();
   });
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-
-  // GitHub navigates via Turbo/SPA, not full loads.
-  document.addEventListener("turbo:load", tryInject);
-  document.addEventListener("pjax:end", tryInject);
-  window.addEventListener("popstate", tryInject);
-
-  tryInject();
 })();
