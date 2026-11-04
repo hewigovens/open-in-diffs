@@ -60,13 +60,9 @@ npm run clean                  # rm -rf dist
 
 ## Releasing
 
-Releases are automated. Tag a version and push:
+Releases are automated: bump `version` in `src/manifest.json` (and `package.json`) and push to `main`. If `v<version>` isn't tagged yet, the [release workflow](.github/workflows/release.yml) signs a `.crx`, creates the tag, and attaches the `.crx` to a new GitHub Release. Don't push the tag yourself; to retry a failed release, run the workflow manually from the Actions tab.
 
-```sh
-git tag v1.1.0 && git push --tags
-```
-
-The [release workflow](.github/workflows/release.yml) signs a `.crx` and attaches it to a GitHub Release. The package is signed with a private key held only in the `CWS_SIGNING_KEY` secret ([Verified CRX Uploads](https://developer.chrome.com/blog/verified-uploads-cws)), kept in the protected `chrome-web-store` environment.
+The package is signed with a private key held only in the `CWS_SIGNING_KEY` secret ([Verified CRX Uploads](https://developer.chrome.com/blog/verified-uploads-cws)), kept in the protected `chrome-web-store` environment.
 
 Publishing to the store itself is manual.
 

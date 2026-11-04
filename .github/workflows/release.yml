@@ -1,11 +1,19 @@
 name: Release
 
+# Bumping "version" in src/manifest.json on main is the release trigger: if
+# v<version> isn't tagged yet, this signs the CRX and creates the tag + release.
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+    paths: [src/manifest.json]
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -14,20 +22,36 @@ jobs:
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - name: Check whether this version is already released
+        id: version
+        run: |
+          tag="v$(jq -r .version src/manifest.json)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+            echo "$tag already exists; nothing to release."
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.version.outputs.new == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "24"
 
       - name: Install tools
+        if: steps.version.outputs.new == 'true'
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends imagemagick librsvg2-bin jq
 
       - name: Install Chrome (needed to sign the CRX)
+        if: steps.version.outputs.new == 'true'
         run: |
           wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt-get install -y /tmp/chrome.deb
           rm -f /tmp/chrome.deb
 
       - name: Pack signed CRX
+        if: steps.version.outputs.new == 'true'
         env:
           CWS_SIGNING_KEY: ${{ secrets.CWS_SIGNING_KEY }}
         run: |
@@ -37,7 +61,10 @@ jobs:
           rm -f "$RUNNER_TEMP/cws-key.pem"
 
       - name: Create GitHub Release
+        if: steps.version.outputs.new == 'true'
         uses: softprops/action-gh-release@e7a8f85e1c67a31e6ed99a94b41bd0b71bbee6b8 # v2.0.9
         with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           files: dist/*.crx
           generate_release_notes: true
