@@ -44,9 +44,14 @@ var DiffTargets = (() => {
     }
   }
 
-  const DIFF_PATH = /^\/[^/]+\/[^/]+\/(?:pull\/\d+(?:\/|$)|compare\/)/;
+  // Sub-pages of a PR (files, checks, …) open the PR itself; a PR's single-commit view is kept. Queries and anchors are GitHub-only.
+  const DIFF_PATHS = [
+    /^\/[\w.-]+\/[\w.-]+\/pull\/\d+(?:\/commits\/[0-9a-f]{40})?(?=\/|$)/,
+    /^\/[\w.-]+\/[\w.-]+\/compare\/[^/].*?(?=\/?$)/,
+    /^\/[\w.-]+\/[\w.-]+\/commit\/[0-9a-f]{7,40}(?=\/|$)/,
+  ];
 
-  // The target's URL for a GitHub PR/compare URL, or null for any other page.
+  // The target's URL for a GitHub PR, compare, or commit URL, or null for any other page.
   function urlFor(target, raw) {
     let url;
     try {
@@ -54,8 +59,9 @@ var DiffTargets = (() => {
     } catch {
       return null;
     }
-    if (url.hostname !== "github.com" || !DIFF_PATH.test(url.pathname)) return null;
-    return target.origin + url.pathname + url.search + url.hash;
+    if (url.hostname !== "github.com") return null;
+    const path = DIFF_PATHS.map((re) => re.exec(url.pathname)?.[0]).find(Boolean);
+    return path ? target.origin + path : null;
   }
 
   return { PRESETS, LEGACY_ID, resolve, load, urlFor };

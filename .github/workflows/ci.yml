@@ -37,6 +37,9 @@ jobs:
           node --check src/targets.js
           node --check src/options.js
 
+      - name: Test
+        run: npm test
+
       - name: Pack CRX (throwaway key — verifies the build end to end)
         run: |
           openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$RUNNER_TEMP/ci-key.pem"

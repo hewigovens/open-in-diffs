@@ -27,6 +27,7 @@
   "scripts": {
     "gen-icons": "bash scripts/gen-icons.sh",
     "pack": "bash scripts/pack-crx.sh",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "node --test"
   }
 }
