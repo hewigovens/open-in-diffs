@@ -6,17 +6,35 @@
     <style>
       :root {
         color-scheme: light dark;
+        --fg: #1f2328;
         --muted: #59636e;
+        --border: #d1d9e0;
+        --surface: #ffffff;
+        --surface-hover: #f6f8fa;
+        --accent: #0969da;
+        --accent-surface: #ddf4ff;
+        --success: #1a7f37;
         --danger: #d1242f;
       }
       @media (prefers-color-scheme: dark) {
         :root {
+          --fg: #f0f6fc;
           --muted: #9198a1;
+          --border: #3d444d;
+          --surface: #151b23;
+          --surface-hover: #212830;
+          --accent: #4493f8;
+          --accent-surface: #121d2f;
+          --success: #3fb950;
           --danger: #f85149;
         }
       }
+      * {
+        box-sizing: border-box;
+      }
       body {
-        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+        color: var(--fg);
         /* No min-width: Edge's options dialog is ~370px and scrolls anything wider. */
         margin: 16px;
       }
@@ -24,38 +42,123 @@
         border: 0;
         margin: 0;
         padding: 0;
+        min-width: 0;
       }
       legend {
+        font-size: 15px;
         font-weight: 600;
-        margin-bottom: 8px;
+        padding: 0;
       }
-      label {
-        display: flex;
-        align-items: baseline;
+      .lede {
+        color: var(--muted);
+        margin: 2px 0 12px;
+      }
+      #presets {
+        display: grid;
         gap: 8px;
-        padding: 4px 0;
       }
-      .note {
+      .option {
+        display: grid;
+        grid-template-columns: 32px 1fr auto;
+        align-items: center;
+        column-gap: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+        cursor: pointer;
+        transition:
+          border-color 120ms,
+          background-color 120ms;
+      }
+      .option:hover {
+        background: var(--surface-hover);
+      }
+      .option:has(:checked) {
+        border-color: var(--accent);
+        background: var(--accent-surface);
+        box-shadow: inset 0 0 0 1px var(--accent);
+      }
+      .option:has(:focus-visible) {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .option img {
+        display: block;
+        width: 32px;
+        height: 32px;
+      }
+      .text {
+        min-width: 0;
+      }
+      .title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        column-gap: 6px;
+      }
+      .name {
+        font-weight: 600;
+      }
+      .host,
+      .detail {
         color: var(--muted);
         font-size: 12px;
       }
-      #status {
-        min-height: 1.5em;
+      .detail {
+        display: block;
+        margin-top: 1px;
+      }
+      .option input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: var(--accent);
+      }
+      .howto {
         margin: 8px 0 0;
+        padding: 12px 0 0;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .howto ul {
+        margin: 4px 0 0;
+        padding-left: 18px;
+      }
+      #status {
+        min-height: 1.45em;
+        margin: 8px 0 0;
+        font-size: 12px;
+        color: var(--success);
       }
       #status.error {
         color: var(--danger);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .option {
+          transition: none;
+        }
       }
     </style>
   </head>
   <body>
     <form id="form">
       <fieldset>
-        <legend>Open GitHub diffs in</legend>
+        <legend>Diff viewer</legend>
+        <p class="lede">Where pull requests, comparisons, and commits open.</p>
         <div id="presets"></div>
       </fieldset>
       <p id="status" role="status"></p>
     </form>
+    <div class="howto">
+      On github.com, open a diff with:
+      <ul>
+        <li>the button beside a pull request's title</li>
+        <li>the toolbar icon</li>
+        <li>the right-click menu</li>
+      </ul>
+    </div>
     <script src="targets.js"></script>
     <script src="options.js"></script>
   </body>

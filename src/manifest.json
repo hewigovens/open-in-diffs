@@ -9,6 +9,9 @@
     "contextMenus",
     "storage"
   ],
+  "host_permissions": [
+    "https://github.com/*"
+  ],
   "content_scripts": [
     {
       "matches": [
@@ -17,6 +20,9 @@
       "js": [
         "targets.js",
         "content.js"
+      ],
+      "css": [
+        "content.css"
       ],
       "run_at": "document_idle"
     }
@@ -29,7 +35,7 @@
     "open_in_tab": false
   },
   "action": {
-    "default_title": "Open in Diff Viewer",
+    "default_title": "Open JayJay Diff home page",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

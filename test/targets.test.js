@@ -8,7 +8,7 @@ const vm = require("node:vm");
 
 const context = vm.createContext({ URL });
 vm.runInContext(fs.readFileSync(path.join(__dirname, "../src/targets.js"), "utf8"), context);
-const { urlFor, resolve } = context.DiffTargets;
+const { urlFor, repoOf, resolve } = context.DiffTargets;
 const target = resolve();
 const open = (url) => urlFor(target, url);
 
@@ -49,4 +49,10 @@ test("ignores pages without a diff", () => {
   ]) {
     assert.equal(open(url), null, url);
   }
+});
+
+test("names the repository of a GitHub URL, case-insensitively", () => {
+  assert.equal(repoOf("https://github.com/Owner/Repo.js/pull/1"), "owner/repo.js");
+  assert.equal(repoOf("https://github.com/owner"), null);
+  assert.equal(repoOf("https://example.com/o/r"), null);
 });

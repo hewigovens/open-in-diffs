@@ -10,7 +10,8 @@
   // on hashed class names. (Compare pages have no stable anchor — handled in
   // the background worker via the menu/toolbar instead.)
   function prNumberLabel() {
-    const m = location.pathname.match(/\/pull\/(\d+)/);
+    const url = DiffTargets.urlFor(target, location.href);
+    const m = url && /^\/[^/]+\/[^/]+\/pull\/(\d+)/.exec(new URL(url).pathname);
     return m ? "#" + m[1] : null;
   }
 
@@ -21,93 +22,107 @@
     return null;
   }
 
+  // GitHub's analytics meta tags name the page's repository and its visibility; the name check skips tags left over from SPA navigation.
+  function privateRepo() {
+    const meta = (name) => document.querySelector(`meta[name="octolytics-dimension-repository_${name}"]`)?.content;
+    const repo = DiffTargets.repoOf(location.href);
+    return repo && meta("nwo")?.toLowerCase() === repo && meta("public") === "false" ? repo : null;
+  }
+
+  let reportedPrivate;
+  function reportVisibility(repo) {
+    if (repo === reportedPrivate) return;
+    reportedPrivate = repo;
+    try {
+      chrome.runtime.sendMessage({ privateRepo: repo }).catch(() => {});
+    } catch {
+      // Orphaned by an extension update; the reloaded tab gets a fresh script.
+    }
+  }
+
   function buildButton() {
-    const btn = document.createElement("button");
+    const btn = document.createElement("a");
     btn.id = BTN_ID;
-    btn.type = "button";
+    btn.target = "_blank";
+    btn.rel = "noopener noreferrer";
     const img = document.createElement("img");
     img.alt = "";
     img.width = 16;
     img.height = 16;
-    img.style.display = "block";
     btn.appendChild(img);
-    applyTarget(btn);
-
-    // Icon-only, sized like GitHub's small icon buttons.
-    Object.assign(btn.style, {
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "28px",
-      height: "28px",
-      padding: "0",
-      marginLeft: "8px",
-      boxSizing: "border-box",
-      borderRadius: "6px",
-      border:
-        "1px solid var(--button-default-borderColor-rest, var(--borderColor-default, rgba(31,35,40,0.15)))",
-      background: "var(--button-default-bgColor-rest, var(--color-btn-bg, #f6f8fa))",
-      cursor: "pointer",
-      // The baseline of an inline-flex box holding only an <img> is the image's
-      // bottom (8px below the button's center). Raise that so the center sits
-      // at the title's cap-height middle (~0.35em above the text baseline).
-      verticalAlign: "calc(0.35em - 8px)",
-    });
-
     return btn;
   }
 
-  function applyTarget(btn) {
-    btn.title = `Open in ${target.name}`;
-    btn.setAttribute("aria-label", btn.title);
-    btn.querySelector("img").src = "data:image/svg+xml," + encodeURIComponent(target.icon);
+  function render(btn, blocked) {
+    if (blocked) {
+      btn.removeAttribute("href");
+      btn.setAttribute("role", "link");
+      btn.setAttribute("aria-disabled", "true");
+      btn.tabIndex = 0;
+      btn.title = `${target.name} opens public repositories only`;
+      btn.setAttribute("aria-label", btn.title);
+    } else {
+      const href = DiffTargets.urlFor(target, location.href) ?? "";
+      if (btn.getAttribute("href") !== href) btn.setAttribute("href", href);
+      btn.removeAttribute("role");
+      btn.removeAttribute("aria-disabled");
+      btn.removeAttribute("tabindex");
+      btn.title = `Open in ${target.name}`;
+      btn.setAttribute("aria-label", `${btn.title} (opens in a new tab)`);
+    }
+    const src = "data:image/svg+xml," + encodeURIComponent(target.icon);
+    const img = btn.querySelector("img");
+    if (img.getAttribute("src") !== src) img.src = src;
   }
 
-  function tryInject() {
+  function sync() {
+    const repo = privateRepo();
+    reportVisibility(repo);
+    const blocked = repo !== null && !target.privateRepos;
+    const existing = document.getElementById(BTN_ID);
     const needle = prNumberLabel();
-    if (!needle || document.getElementById(BTN_ID)) return;
+    if (!needle) return existing?.remove();
+    if (existing) return render(existing, blocked);
     const title = findPrTitle(needle);
     if (!title) return;
-    // Newer GitHub renders the visible "#123" as a sibling after the <h1>; go
-    // after it so the button doesn't split the title from its number.
-    const suffix = title.nextElementSibling;
-    const anchor = suffix?.textContent.includes(needle) ? suffix : title;
     const btn = buildButton();
-    anchor.appendChild(btn);
+    render(btn, blocked);
+    // Outside the <h1> so it stays out of the heading's name; newer GitHub renders the visible "#123" as the next sibling.
+    const suffix = title.nextElementSibling;
+    if (suffix?.textContent.includes(needle)) suffix.appendChild(btn);
+    else title.after(btn);
   }
 
   async function refreshTarget() {
     target = await DiffTargets.load();
-    const btn = document.getElementById(BTN_ID);
-    if (btn) applyTarget(btn);
+    sync();
   }
 
   chrome.storage.onChanged.addListener(refreshTarget);
 
-  // Delegated, not on the button: Turbo restores pages from cloned snapshots
-  // (Back/Forward), and a clone keeps the button but loses its own listeners.
-  document.addEventListener("click", (e) => {
-    if (!(e.target instanceof Element) || !e.target.closest("#" + BTN_ID)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const url = DiffTargets.urlFor(target, location.href);
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
-  });
-
   // Inject only once the stored choice is known, so the button never shows
   // (or opens) the default viewer for a user who picked another.
   refreshTarget().then(() => {
+    let lastHref = location.href;
     new MutationObserver(() => {
-      if (!document.getElementById(BTN_ID)) tryInject();
+      if (location.href !== lastHref || (!document.getElementById(BTN_ID) && prNumberLabel())) {
+        lastHref = location.href;
+        sync();
+      }
     }).observe(document.documentElement, { childList: true, subtree: true });
 
     // GitHub navigates via Turbo/SPA, not full loads, so the manifest injects
     // this on every github.com page: arriving at a PR from e.g. the PR list
     // never reloads, and a PR-only match would leave the button missing.
-    document.addEventListener("turbo:load", tryInject);
-    document.addEventListener("pjax:end", tryInject);
-    window.addEventListener("popstate", tryInject);
-
-    tryInject();
+    document.addEventListener("turbo:load", sync);
+    document.addEventListener("pjax:end", sync);
+    window.addEventListener("popstate", sync);
+    // A page restored from the back/forward cache keeps this script's state, but the worker
+    // dropped the tab's visibility when it left github.com, so report it again.
+    window.addEventListener("pageshow", (e) => {
+      if (!e.persisted) return;
+      reportedPrivate = undefined;
+      sync();
+    });
   });
 })();

@@ -30,7 +30,7 @@ bash scripts/gen-icons.sh >/dev/null
 STAGE=$(mktemp -d)
 CRX_TMP="$STAGE.crx"
 trap 'rm -rf "$STAGE" "$CRX_TMP"' EXIT
-cp src/manifest.json src/targets.js src/content.js src/background.js src/options.html src/options.js "$STAGE/"
+cp src/manifest.json src/targets.js src/content.js src/content.css src/background.js src/options.html src/options.js "$STAGE/"
 mkdir -p "$STAGE/icons"
 cp src/icons/icon16.png src/icons/icon48.png src/icons/icon128.png "$STAGE/icons/"
 
