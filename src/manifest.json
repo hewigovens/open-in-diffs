@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Open in Diff Viewer",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Open GitHub pull requests and compare pages in a better diff viewer: JayJay Diff or Diffshub.",
   "homepage_url": "https://github.com/hewigovens/open-in-diffs",
   "permissions": [
@@ -12,7 +12,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://github.com/*/*/pull/*"
+        "https://github.com/*"
       ],
       "js": [
         "targets.js",
