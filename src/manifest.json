@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Open in Diff Viewer",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Open GitHub pull requests, comparisons, and commits in JayJay Diff (or Diffshub).",
   "homepage_url": "https://github.com/hewigovens/open-in-diffs",
   "permissions": [
