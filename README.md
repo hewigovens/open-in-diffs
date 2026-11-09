@@ -9,11 +9,13 @@ JayJay Diff is the default viewer; [Diffshub](https://diffshub.com) is the alter
 
 > **Not affiliated with diffshub.com.** The Diffshub option simply links to diffshub.com; this extension is not made, endorsed, or maintained by Diffshub.
 
-## Demo
+## Screenshots
 
-![Open in Diff Viewer demo](docs/demo.gif)
+![The PR button opens a pull request in JayJay Diff](docs/store-1-jayjay.png)
 
-_Higher-quality recording: [docs/demo.webm](docs/demo.webm)._
+![The same pull request in Diffshub](docs/store-2-diffshub.png)
+
+![Options: choose JayJay Diff or Diffshub](docs/store-3-options.png)
 
 ## Features
 
@@ -87,7 +89,7 @@ scripts/
 ├── gen-icons.sh                  # rasterize the SVG into PNGs (ImageMagick)
 ├── pack-crx.sh                   # sign src/ into a .crx (Chromium)
 └── publish-cws.sh                # upload + publish to the Chrome Web Store
-.github/workflows/                # ci.yml (build) and release.yml (sign + publish)
+.github/workflows/                # ci.yml (build + test) and release.yml (sign + GitHub release)
 test/                             # node --test (npm test)
-docs/                             # demo.gif, demo.webm, store screenshot
+docs/                             # store screenshots (also used above)
 ```
